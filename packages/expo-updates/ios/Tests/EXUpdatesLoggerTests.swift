@@ -21,12 +21,7 @@ class EXUpdatesLoggerTests: XCTestCase {
     logger.warn(message: "Warning message", code: .AssetsFailedToLoad, updateId: "myUpdateId", assetId: "myAssetId")
 
     // Use reader to retrieve messages
-    var logEntries: [String] = []
-    do {
-      logEntries = try logReader.getLogEntries(newerThan: epoch)
-    } catch {
-      XCTFail("logEntries call failed: \(error.localizedDescription)")
-    }
+    let logEntries: [String] = logReader.getLogEntries(newerThan: epoch)
 
     // Verify number of log entries and decoded values
     XCTAssertTrue(logEntries.count >= 2)
@@ -71,12 +66,7 @@ class EXUpdatesLoggerTests: XCTestCase {
 
     // Get all entries newer than the date
     // Use reader to retrieve messages
-    var logEntries: [String] = []
-    do {
-      logEntries = try logReader.getLogEntries(newerThan: epoch)
-    } catch {
-      XCTFail("logEntries call failed: \(error.localizedDescription)")
-    }
+    let logEntries: [String] = logReader.getLogEntries(newerThan: epoch)
 
     // Verify that only the expected message shows up in the reader
     let logEntryText: String = logEntries[logEntries.count - 1] as String
