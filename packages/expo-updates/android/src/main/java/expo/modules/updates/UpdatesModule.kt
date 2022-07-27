@@ -20,7 +20,12 @@ import expo.modules.updates.manifest.UpdateManifest
 
 // these unused imports must stay because of versioning
 /* ktlint-disable no-unused-imports */
-import expo.modules.updates.UpdatesConfiguration
+import expo.modules.updates.logging.UpdatesErrorCode
+import expo.modules.updates.logging.UpdatesLogEntry
+import expo.modules.updates.logging.UpdatesLogReader
+import expo.modules.updates.logging.UpdatesLogger
+import java.util.*
+
 /* ktlint-enable no-unused-imports */
 
 class UpdatesModule(
@@ -40,6 +45,7 @@ class UpdatesModule(
   }
 
   override fun getConstants(): Map<String, Any> {
+    UpdatesLogger().info("UpdatesModule: getConstants called", UpdatesErrorCode.None)
     val constants = mutableMapOf<String, Any>()
     try {
       val updatesServiceLocal: UpdatesInterface? = updatesService
@@ -243,6 +249,42 @@ class UpdatesModule(
         "ERR_UPDATES_FETCH",
         "The updates module controller has not been properly initialized. If you're using a development client, you cannot fetch updates. Otherwise, make sure you have called the native method UpdatesController.initialize()."
       )
+    }
+  }
+
+  @ExpoMethod
+  fun readLogEntriesAsync(maxAge: Int, promise: Promise) {
+    AsyncTask.execute {
+      val reader = UpdatesLogReader()
+      val date = Date()
+      val epoch = Date(date.time - maxAge * 1000)
+      val result = reader.getLogEntries(epoch).map {
+        val entry = UpdatesLogEntry.create(it)
+        val entryBundle = Bundle()
+        entryBundle.putLong("timestamp", entry.timestamp)
+        entryBundle.putString("message", entry.message)
+        entryBundle.putString("code", entry.code)
+        entryBundle.putString("level", entry.level)
+        if (entry.updateId != null) {
+          entryBundle.putString("updateId", entry.updateId)
+        }
+        if (entry.assetId != null) {
+          entryBundle.putString("assetId", entry.assetId)
+        }
+        if (entry.stacktrace != null) {
+          entryBundle.putStringArray("stacktrace", entry.stacktrace.toTypedArray())
+        }
+        entryBundle
+      }
+      promise.resolve(result)
+    }
+  }
+
+  @ExpoMethod
+  fun clearLogEntriesAsync(promise: Promise) {
+    AsyncTask.execute {
+      // This method is a no-op until persistent logs are implemented
+      promise.resolve(null)
     }
   }
 

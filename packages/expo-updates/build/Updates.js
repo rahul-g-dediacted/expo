@@ -132,6 +132,40 @@ export async function checkForUpdateAsync() {
     }
     return result;
 }
+// @docsMissing
+/**
+ * Retrieves the most recent expo-updates log entries from the client, going back maxAge seconds
+ * (default: 3600 seconds = 1 hour)
+ *
+ * @return A promise that fulfills with an array of [`UpdatesLogEntry`](#updateslogentry) objects;
+ *
+ * The promise rejects if there is an unexpected error in retrieving the logs.
+ */
+export async function readLogEntriesAsync(maxAge) {
+    if (!ExpoUpdates.readLogEntriesAsync) {
+        throw new UnavailabilityError('Updates', 'readLogEntriesAsync');
+    }
+    const age = maxAge || 3600;
+    const result = await ExpoUpdates.readLogEntriesAsync(age);
+    return result;
+}
+// @docsMissing
+/**
+ * Clears existing expo-updates log entries from the client.
+ *
+ * @return A promise that fulfills if the clear operation was successful.
+ *
+ * The promise rejects if there is an unexpected error in clearing the logs.
+ *
+ * For now, this operation does nothing on the client.  Once log persistence has been
+ * implemented, this operation will actually remove existing logs.
+ */
+export async function clearLogEntriesAsync() {
+    if (!ExpoUpdates.clearLogEntriesAsync) {
+        throw new UnavailabilityError('Updates', 'clearLogEntriesAsync');
+    }
+    await ExpoUpdates.clearLogEntriesAsync();
+}
 /**
  * Downloads the most recently deployed update to your project from server to the device's local
  * storage. This method cannot be used in development mode, and the returned promise will be

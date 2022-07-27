@@ -86,6 +86,20 @@ export type UpdateEvent = {
 
 // @docsMissing
 /**
+ * An object representing a single log entry from expo-updates logging on the client.
+ */
+export type UpdatesLogEntry = {
+  timestamp: number;
+  message: string;
+  code: string;
+  level: string;
+  updateId?: string;
+  assetId?: string;
+  stacktrace?: string[];
+};
+
+// @docsMissing
+/**
  * @hidden
  */
 export type LocalAssets = Record<string, string>;
